@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
                 Greeting(viewModel)
             }
         }
+
         API_KEY = resources.getString(R.string.api_key)
 
         viewModel.data_load_error.observe(this, {

@@ -1,5 +1,8 @@
 # The Barometer 
-### A weather forecast app
+#### A weather forecast app
+
+### Note
+For running the app you will need to enter your api key in strings.xml
 
 ## Requirement Analysis
 ### Objective
@@ -21,4 +24,11 @@
 
 ### App Structure
 1. This app can be a single Activity since only fetching and displaying the data is the main focus.
-2. MVVM Architecture should be followed.
+2. The code is done using MVVM architecture and Standard Android guidelines.
+
+### ScreenShot
+![screenshot](./screenshot.png)
+
+### Structure
+![Architecture](./structure.png)
+

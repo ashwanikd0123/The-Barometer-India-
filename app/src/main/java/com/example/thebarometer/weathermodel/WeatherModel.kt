@@ -26,6 +26,7 @@ class WeatherModel() {
         return context.assets.open("city_india.json").bufferedReader().use { it.readText() }
     }
 
+    // loads city list from json file
     fun loadCityList(context: Context) {
         cityList = Gson().fromJson(readCityListJson(context), object : TypeToken<List<CityItem>>() {}.type)
         weatherFetchRoom = WeatherModelRoom(context)
@@ -35,6 +36,7 @@ class WeatherModel() {
         return cityList.filter { it.name.contains(cityName, ignoreCase = true) }
     }
 
+    // convert response of http to three day forecast WeatherForecastData
     fun toThreeDayForecast(apiResp: ForecastResponse): WeatherForecastData {
         for (wd: WeatherItem in apiResp.list) {
             Log.d("WeatherModel", " " +  wd.dt)
@@ -64,14 +66,17 @@ class WeatherModel() {
 
     suspend fun fetchWeatherData(cityName: String, apiKey: String): WeatherForecastData? {
         try {
+            // first check in room database
             val todayDate = sdf.format(Date())
             val data = weatherFetchRoom.getData(cityName)
             if (data.isNotEmpty() && data[0].startDate == todayDate) {
                 return Gson().fromJson(data[0].json, object : TypeToken<WeatherForecastData>() {}.type)
             }
 
+            // download from api
             val result: WeatherForecastData = toThreeDayForecast(weatherFetchRetroFit.fetchWeather(cityName, apiKey))
 
+            // insert data in room database
             if (data.isNotEmpty()) {
                 weatherFetchRoom.updateData(WeatherDataCity().apply {
                     city = cityName

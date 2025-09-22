@@ -10,7 +10,7 @@ import com.example.thebarometer.weathermodel.WeatherModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class WeatherViewModel() : ViewModel() {
+class WeatherViewModel : ViewModel() {
     val weather_data : MutableLiveData<WeatherForecastData> = MutableLiveData<WeatherForecastData>()
     val city_name : MutableLiveData<String> = MutableLiveData<String>()
     val city_list_loading : MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
@@ -24,6 +24,8 @@ class WeatherViewModel() : ViewModel() {
         setInvalidData()
     }
 
+    // loads data of cities from the json file
+    // this data has been downloaded and filtered from https://api.openweathermap.org/data/2.5/weather?id=1277333&appid=YOUR_KEY&units=metric
     fun loadCityData(context: Context) {
         city_list_loading.value = true
         viewModelScope.launch(Dispatchers.IO) {
@@ -32,6 +34,7 @@ class WeatherViewModel() : ViewModel() {
         }
     }
 
+    // sets all data to invalid
     private fun setInvalidData() {
         weather_data.postValue(WeatherForecastData(listOf(
             WeatherData("-", "-", "-"),
@@ -40,6 +43,7 @@ class WeatherViewModel() : ViewModel() {
         city_name.postValue("-")
     }
 
+    // updates data based on city
     fun updateCity(cityName: String, apiKey: String) {
         fetching_data.value = true
         viewModelScope.launch(Dispatchers.IO) {
