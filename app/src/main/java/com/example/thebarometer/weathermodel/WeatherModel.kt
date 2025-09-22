@@ -20,8 +20,6 @@ class WeatherModel() {
     private lateinit var weatherFetchRoom: WeatherModelRoom
     private lateinit var cityList: List<CityItem>
 
-
-
     fun readCityListJson(context: Context): String {
         return context.assets.open("city_india.json").bufferedReader().use { it.readText() }
     }
