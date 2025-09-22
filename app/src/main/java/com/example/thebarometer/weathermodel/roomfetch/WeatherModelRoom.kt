@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 
 class WeatherModelRoom(context: Context) {
-    val db = Room.databaseBuilder(context, WeatherDatabase::class.java, "weather-db").build()
-    val dao = db.getWeatherDao()
+    private val db = Room.databaseBuilder(context, WeatherDatabase::class.java, "weather-db").build()
+    private val dao = db.getWeatherDao()
 
     fun getData(city: String): List<WeatherDataCity> {
         return dao.findData(city)

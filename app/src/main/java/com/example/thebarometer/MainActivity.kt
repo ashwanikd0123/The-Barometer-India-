@@ -35,7 +35,8 @@ import com.example.thebarometer.weatherviewmodel.WeatherViewModel
 lateinit var API_KEY : String
 
 class MainActivity : ComponentActivity() {
-    val viewModel: WeatherViewModel by viewModels()
+    private val viewModel: WeatherViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

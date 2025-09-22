@@ -14,13 +14,13 @@ import java.util.Date
 import java.util.Locale
 
 class WeatherModel() {
+    private val mSimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val weatherFetchRetroFit = WeatherFetchRetrofit()
 
-    lateinit var cityList: List<CityItem>
+    private lateinit var weatherFetchRoom: WeatherModelRoom
+    private lateinit var cityList: List<CityItem>
 
-    val weatherFetchRetroFit = WeatherFetchRetrofit()
-    lateinit var weatherFetchRoom: WeatherModelRoom
 
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     fun readCityListJson(context: Context): String {
         return context.assets.open("city_india.json").bufferedReader().use { it.readText() }
@@ -49,7 +49,7 @@ class WeatherModel() {
 
         val threeDayItems = apiResp.list
             .filter { it.dt in now..threeDaysLater }
-            .groupBy { sdf.format(Date(it.dt * 1000)) }
+            .groupBy { mSimpleDateFormat.format(Date(it.dt * 1000)) }
 
         val result = threeDayItems.entries.take(3).map { (date, items) ->
             val avgTemp = items.map { it.main.temp }.average()
@@ -67,7 +67,7 @@ class WeatherModel() {
     suspend fun fetchWeatherData(cityName: String, apiKey: String): WeatherForecastData? {
         try {
             // first check in room database
-            val todayDate = sdf.format(Date())
+            val todayDate = mSimpleDateFormat.format(Date())
             val data = weatherFetchRoom.getData(cityName)
             if (data.isNotEmpty() && data[0].startDate == todayDate) {
                 return Gson().fromJson(data[0].json, object : TypeToken<WeatherForecastData>() {}.type)
