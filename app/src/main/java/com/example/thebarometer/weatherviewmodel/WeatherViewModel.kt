@@ -55,25 +55,17 @@ class WeatherViewModel() : ViewModel() {
             city_found.postValue(true)
 
             val name = names[0].name + ",IN"
-            weatherModel.fetchWeatherData(name, apiKey, {
-                if (it == null) {
-                    data_load_error.postValue(true)
-                    fetching_data.postValue(false)
-                    setInvalidData()
-                    return@fetchWeatherData
-                }
-                val data = weatherModel.toThreeDayForecast(it)
-                if (data.data.isEmpty()) {
-                    data_load_error.postValue(true)
-                    fetching_data.postValue(false)
-                    setInvalidData()
-                    return@fetchWeatherData
-                }
-
-                city_name.postValue(name)
-                weather_data.postValue(data)
+            val data = weatherModel.fetchWeatherData(name, apiKey)
+            if (data == null || data.data.isEmpty()) {
+                data_load_error.postValue(true)
                 fetching_data.postValue(false)
-            })
+                setInvalidData()
+                return@launch
+            }
+
+            city_name.postValue(name)
+            weather_data.postValue(data!!)
+            fetching_data.postValue(false)
         }
     }
 }

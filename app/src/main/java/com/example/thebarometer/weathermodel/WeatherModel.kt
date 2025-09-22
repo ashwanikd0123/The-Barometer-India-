@@ -56,7 +56,13 @@ class WeatherModel() {
         return WeatherForecastData(result)
     }
 
-    suspend fun fetchWeatherData(cityName: String, apiKey: String, callback: (ForecastResponse?) -> Unit) {
-        weatherFetch.fetchWeather(cityName, apiKey, callback)
+    suspend fun fetchWeatherData(cityName: String, apiKey: String): WeatherForecastData? {
+        try {
+            val result: WeatherForecastData = toThreeDayForecast(weatherFetch.fetchWeather(cityName, apiKey))
+            return result
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
     }
 }
