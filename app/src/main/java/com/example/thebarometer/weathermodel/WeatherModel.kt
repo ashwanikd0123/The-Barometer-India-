@@ -5,6 +5,8 @@ import android.util.Log
 import com.example.thebarometer.weathermodel.retrofitfetch.ForecastResponse
 import com.example.thebarometer.weathermodel.retrofitfetch.WeatherFetchRetrofit
 import com.example.thebarometer.weathermodel.retrofitfetch.WeatherItem
+import com.example.thebarometer.weathermodel.roomfetch.WeatherDataCity
+import com.example.thebarometer.weathermodel.roomfetch.WeatherModelRoom
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
@@ -15,7 +17,10 @@ class WeatherModel() {
 
     lateinit var cityList: List<CityItem>
 
-    val weatherFetch = WeatherFetchRetrofit()
+    val weatherFetchRetroFit = WeatherFetchRetrofit()
+    lateinit var weatherFetchRoom: WeatherModelRoom
+
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     fun readCityListJson(context: Context): String {
         return context.assets.open("city_india.json").bufferedReader().use { it.readText() }
@@ -23,6 +28,7 @@ class WeatherModel() {
 
     fun loadCityList(context: Context) {
         cityList = Gson().fromJson(readCityListJson(context), object : TypeToken<List<CityItem>>() {}.type)
+        weatherFetchRoom = WeatherModelRoom(context)
     }
 
     fun queryCity(cityName: String): List<CityItem> {
@@ -37,7 +43,7 @@ class WeatherModel() {
         val now = System.currentTimeMillis() / 1000
         val threeDaysLater = now + 72 * 3600
 
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
 
         val threeDayItems = apiResp.list
             .filter { it.dt in now..threeDaysLater }
@@ -58,7 +64,28 @@ class WeatherModel() {
 
     suspend fun fetchWeatherData(cityName: String, apiKey: String): WeatherForecastData? {
         try {
-            val result: WeatherForecastData = toThreeDayForecast(weatherFetch.fetchWeather(cityName, apiKey))
+            val todayDate = sdf.format(Date())
+            val data = weatherFetchRoom.getData(cityName)
+            if (data.isNotEmpty() && data[0].startDate == todayDate) {
+                return Gson().fromJson(data[0].json, object : TypeToken<WeatherForecastData>() {}.type)
+            }
+
+            val result: WeatherForecastData = toThreeDayForecast(weatherFetchRetroFit.fetchWeather(cityName, apiKey))
+
+            if (data.isNotEmpty()) {
+                weatherFetchRoom.updateData(WeatherDataCity().apply {
+                    city = cityName
+                    startDate = todayDate
+                    json = Gson().toJson(result)
+                })
+            } else {
+                weatherFetchRoom.addData(WeatherDataCity().apply {
+                    city = cityName
+                    startDate = todayDate
+                    json = Gson().toJson(result)
+                })
+            }
+
             return result
         } catch (e: Exception) {
             e.printStackTrace()
