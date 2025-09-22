@@ -27,7 +27,7 @@ For running the app you will need to enter your api key in strings.xml
 2. The code is done using MVVM architecture and Standard Android guidelines.
 
 ### ScreenShot
-![screenshot](./screenshot.png)
+![screenshot](./Screenshot_app.png)
 
 ### Structure
 ![Architecture](./structure.png)
